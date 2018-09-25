@@ -6,6 +6,7 @@ from sklearn.ensemble import RandomForestRegressor
 # from sklearn.model_selection import train_test_split
 from salestools import Prior_Month
 from typing import List
+import os
 
 
 def SalesPredictionModel(store_id: int, sales: pd.DataFrame, fscls: List[int],
@@ -32,10 +33,10 @@ def SalesPredictionModel(store_id: int, sales: pd.DataFrame, fscls: List[int],
 
 		# Model
 		if flag_model == 'xgb':
-			model = XGBRegressor(n_jobs=-1, silent=1, subsample=0.8, eval_metric='rmse', max_depth=5,
-								 n_estimator=100, gamma=0.3, min_child_weight=1)
+			model = XGBRegressor(n_jobs=-1, silent=1, subsample=0.8, eval_metric='rmse', max_depth=4,
+								 n_estimator=120, gamma=0.3, min_child_weight=1)
 		elif flag_model == 'rf':
-			model = RandomForestRegressor(n_jobs=-1, max_depth=8, min_samples_leaf=2, n_estimators=120)
+			model = RandomForestRegressor(n_jobs=-1, max_depth=8, min_samples_leaf=1, n_estimators=40)
 
 		model.fit(train_data, train_label)
 
@@ -64,9 +65,13 @@ def SalesPredictionModel(store_id: int, sales: pd.DataFrame, fscls: List[int],
 	if flag_log:
 		ape_file = '../TrafficPrediction/APE_MAPE_Log/Error_APE_' + str(store_id) + '.csv'
 		mape_file = '../TrafficPrediction/APE_MAPE_Log/Error_MAPE_' + str(store_id) + '.csv'
+		if not os.path.exists('../TrafficPrediction/APE_MAPE_Log'):
+			os.mkdir('../TrafficPrediction/APE_MAPE_Log')
 	else:
 		ape_file = '../TrafficPrediction/APE_MAPE/Error_APE_' + str(store_id) + '.csv'
 		mape_file = '../TrafficPrediction/APE_MAPE/Error_MAPE_' + str(store_id) + '.csv'
+		if not os.path.exists('../TrafficPrediction/APE_MAPE'):
+			os.mkdir('../TrafficPrediction/APE_MAPE')
 
 	df_predict.to_csv(ape_file)
 	df_mape = df_predict[['fscl_mn_id', 'abs_ape']].groupby('fscl_mn_id').agg({'abs_ape': np.mean}).reset_index()

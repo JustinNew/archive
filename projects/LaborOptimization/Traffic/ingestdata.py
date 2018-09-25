@@ -37,5 +37,3 @@ if __name__ == '__main__':
     file = './Hourly_Traffic Beg 17 - Aug 18.txt'
 
     ReadInTrafficData(file)
-
-    return
